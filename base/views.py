@@ -3,7 +3,7 @@ from django.shortcuts import render
 
 # Create your views here.
 def home(request): # for one page as homepage
-    return HttpResponse('Hello World!')
+    return render(request, 'home.html')
 
 def room(request):
-    return HttpResponse('Hello Room!') # another page in /room
+    return render(request, 'room.html')
