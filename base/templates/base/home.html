@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Home template</h1>
+
+<div>
+    {% for room in rooms %}
+        <div>
+            <h2>{{ room.id }}</h2>
+            <a href="{% url 'room' room.id %}">
+            <p>{{ room.name }}</p>
+            </a>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock content %}
