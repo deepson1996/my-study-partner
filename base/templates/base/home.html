@@ -5,9 +5,13 @@
 <div>
     {% for room in rooms %}
         <div>
+            {% comment %} We can call relationship in below way {% endcomment %}
+            <span>@{{ room.host.username }}</span> 
             <h2>{{ room.id }}</h2>
             <a href="{% url 'room' room.id %}">
             <p>{{ room.name }}</p>
+            <small>{{ room.topic.name }}</small>
+            <hr>
             </a>
         </div>
     {% endfor %}
