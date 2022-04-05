@@ -1,6 +1,7 @@
 from multiprocessing import context
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.db.models import Q
 from .models import Room, Topic
 from .forms import RoomForm
 rooms = [
@@ -8,46 +9,52 @@ rooms = [
     {'id': 2, 'name': 'Design with me'},
     {'id': 3, 'name': 'Frontend developers'},
 ]
-# Create your views here.
-def home(request): # for one page as homepage
-    rooms = Room.objects.all() # overrites rooms
-    context = {"rooms": rooms}
+
+
+def home(request):
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    # $room->topic->name if contains but like jaso kam garchha strict ko laagi icontains ko thauma contains matrai use garna milchha
+    rooms = Room.objects.filter(
+        Q(topic__name__icontains=q) |
+        Q(name__icontains=q) |
+        Q(description__icontains=q) 
+        )
+    room_count = rooms.count()
+    topics = Topic.objects.all()
+    context = {"rooms": rooms, "topics": topics, "room_count":room_count}
     return render(request, 'base/home.html', context)
 
+
 def room(request, pk):
-    # room = None
-    # for i in rooms:
-    #     if i['id'] == int(pk):
-    #         room = i
-    #getting from database
     room = Room.objects.get(id=pk)
     context = {'room': room}
     return render(request, 'base/room.html', context)
 
+
 def createRoom(request):
     form = RoomForm()
     if request.method == 'POST':
-    #    request.POST.get('name')
         form = RoomForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect("home")
 
-    context = {'form':form}
+    context = {'form': form}
     return render(request, 'base/room_form.html', context)
+
 
 def updateRoom(request, pk):
     room = Room.objects.get(id=pk)
-    form = RoomForm(instance = room)
+    form = RoomForm(instance=room)
     if request.method == 'POST':
         form = RoomForm(request.POST, instance=room)
         if(form.is_valid):
             form.save()
             return redirect('home')
 
-
-    context = {'form':form}
+    context = {'form': form}
     return render(request, 'base/room_form.html', context)
+
 
 def deleteRoom(request, pk):
     room = Room.objects.get(id=pk)
